@@ -1,0 +1,27 @@
+Ticket Heading: DEX-API-Archive Trigger File Responce (from Median) and achive load Segment Position data
+
+Epic link: ProdSupport/Client Implementation Optimization
+
+Summary:
+For the Trigger File Generation workflow, trigger files are archived so that prod services can access them and review data if clients question trigger data. The dex-api has no equivalent functionality.
+Secondly, in dbo.FileLoadQueue there is a column called FilePath which holds values like:
+\\amznfsxtdgy3xjn.rpltd.com\BulkLoadData\api) and a FileName which holds values like:
+GPIER 966380_proxy_4126459.api
+I believe the idea was to save and archive LoadSegment response data, position data, so that we could see exactly what the client responded with, thus helping us investigate reported issues.
+We need to build a solution to save and archive both these responses.
+NOTE: The proc that generates data for dex-api triggers is handled by a SQL agent job that runs msp_process_GenerateCUSIP TriggerFile every 8pm M-F
+trigger verification job that's runs at 8:30pm m-f
+
+Based on the below requirents and SQL statement:
+
+Requirements:
+Get a list of clients that have dex-api scope: dex/trigger:all
+Make calls to: /data-exchange/trigger for each client with that scope
+Save the response and upload it to s3. The $3 folder structure should be trigger/[clientid]/file with the file name having: clientid_trigger_yyyymmdd where the date is the trigger date
+
+
+SQL to indentify which clients we want to archive dex-api response for:
+use Mediant
+SELECT DISTINCT c.ClientID, c.name FROM Client c
+inner JOIN ClientServiceExt cs ON c.ClientID = cs.ClientID WHERE c.OAuth2ClientCredentialsID is not NULL
+AND cs.ServiceID IN (2,8,3,4,5)

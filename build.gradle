@@ -1,0 +1,50 @@
+apply plugin: 'java'
+
+group = 'com.example'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+// Use classic compatibility settings for broader Gradle compatibility
+sourceCompatibility = '17'
+targetCompatibility = '17'
+
+dependencies {
+    implementation 'com.zaxxer:HikariCP:5.0.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+    implementation 'software.amazon.awssdk:s3:2.20.40'
+    implementation 'org.slf4j:slf4j-simple:2.0.9'
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
+}
+
+// Note: `useJUnitPlatform()` is not available on very old Gradle versions; the project
+// relies on the JUnit Jupiter dependency. If your Gradle supports the configuration,
+// you can add `test { useJUnitPlatform() }` back.
+
+// Configure jar manifest Main-Class and set output file name to `output.jar`
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.mediant.api.dataexchange.app.ArchiverApp'
+    }
+    // set base name to 'output' and omit version so artifact is 'output.jar'
+    // set base name to project-specific name so artifact is
+    // `dex-trigger-response-archive-<version>.jar` (e.g. dex-trigger-response-archive-1.0.0.jar)
+    archiveBaseName.set('dex-trigger-response-archive')
+    archiveVersion.set(project.version.toString())
+}
+
+// Provide a compatible `run` task for environments without the application plugin
+task run(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'com.mediant.api.dataexchange.app.ArchiverApp'
+}
+
+// Ensure a reproducible `output.jar` artifact in `build/libs`.
+// Some environments or Gradle versions may still produce name-version jars;
+// this task creates/overwrites `build/libs/output.jar` from the standard `jar` task output.
+// No extra copy task required: the `jar` task is configured to produce
+// `dex-trigger-response-archive-<version>.jar` directly via `archiveBaseName`/`archiveVersion`.
