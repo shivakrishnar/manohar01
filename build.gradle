@@ -1,5 +1,12 @@
 apply plugin: 'java'
 
+// Fail fast with a clear message when an older system Gradle is used instead of the wrapper.
+import org.gradle.util.GradleVersion
+def _requiredGradle = GradleVersion.version("6.7")
+if (GradleVersion.current() < _requiredGradle) {
+    throw new GradleException("Gradle ${_requiredGradle} or newer is required to build this project. Use the project wrapper: ./gradlew clean build")
+}
+
 group = 'com.example'
 version = '1.0.0'
 
@@ -8,8 +15,15 @@ repositories {
 }
 
 // Use classic compatibility settings for broader Gradle compatibility
-sourceCompatibility = '17'
-targetCompatibility = '17'
+sourceCompatibility = '21'
+targetCompatibility = '21'
+
+// Request Java 21 via Gradle toolchain so builds can use a matching JDK when available
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
 
 dependencies {
     implementation 'com.zaxxer:HikariCP:5.0.1'

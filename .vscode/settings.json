@@ -1,3 +1,10 @@
 {
+  // Prefer the Gradle wrapper for imports/builds so the IDE uses the project's Gradle version
+  "java.import.gradle.wrapper.enabled": true,
+  // Use the workspace JDK if configured by the user/IDE; don't hard-code runtimes here.
+  // Keep settings minimal to avoid forcing system-specific paths.
+  "java.configuration.checkProjectSettingsExclusions": false
+}
+{
     "java.configuration.updateBuildConfiguration": "interactive"
 }
