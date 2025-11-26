@@ -6,3 +6,10 @@
 *.class
 /.settings
 /.project
+
+# Python artifacts
+python/.venv/
+python/dist/
+**/__pycache__/
+**/*.py[cod]
+**/*.egg-info/
