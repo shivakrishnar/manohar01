@@ -25,3 +25,18 @@ Notes
 - This port mirrors the Java structure (simplified) with: ArchiverApp (CLI), ArchiverService, TriggerFetcher, TokenProvider, DAOs, and storage uploaders.
 - The S3 uploader uses `boto3`.
 - The Python implementation is intentionally minimal — a drop-in skeleton to make migration and testing easier.
+
+Packaging
+---------
+
+The repository includes a ``pyproject.toml`` in `python/` so you can build standard Python artifacts (wheel + sdist).
+
+Local build example (recommended in a venv):
+
+```bash
+python3 -m pip install --upgrade build
+cd python
+./build.sh
+```
+
+Artifacts will be written to `python/dist/`.
