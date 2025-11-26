@@ -34,7 +34,14 @@ class ArchiverLambdaService:
         if not bucket:
             raise RuntimeError('BUCKET must be configured (env or cfg)')
         prefix = os.environ.get('PREFIX', '') or self.cfg.get('prefix', '')
-        self.uploader = S3Uploader({'bucket': bucket, 'prefix': prefix})
+        # Support local filesystem uploads when BUCKET is an absolute path (useful for local testing)
+        if os.path.isabs(bucket) or bucket.startswith('.') or bucket.startswith('/'):  # treat as local directory
+            from .storage.local_uploader import LocalUploader
+
+            local_dir = os.path.join(bucket, prefix) if prefix else bucket
+            self.uploader = LocalUploader({'local_dir': local_dir})
+        else:
+            self.uploader = S3Uploader({'bucket': bucket, 'prefix': prefix})
 
         self.trigger_base = os.environ.get('TRIGGER_BASE_URL') or self.cfg.get('trigger_base_url')
         self.client_token_url = os.environ.get('CLIENT_TOKEN_URL') or self.cfg.get('client_token_url')
@@ -66,7 +73,13 @@ class ArchiverLambdaService:
 
             # Determine trigger URL per client
             trigger_url = c.get('trigger_url') or (self.trigger_base.rstrip('/') + '/data-exchange/trigger' if self.trigger_base else None)
-            if not trigger_url:
+            # compute sample_count early (used to decide if we should use sample fallback)
+            sample_count = c.get('sample_count')
+            if sample_count is None:
+                sample_count = self.cfg.get('api', {}).get('sample_count', 0)
+
+            # if there is no trigger_url, allow a fallback to sample data when sample_count > 0
+            if not trigger_url and (sample_count is None or int(sample_count) == 0):
                 # nothing to fetch
                 continue
 
@@ -83,8 +96,9 @@ class ArchiverLambdaService:
                     print(f"Token exchange failed for client {client_id}: {e}")
                     continue
 
-            # Fetch triggers using TriggerFetcher
-            fetcher = TriggerFetcher({'url': trigger_url, 'sample_count': 0})
+            # Fetch triggers using TriggerFetcher (fetcher_url already set accordingly)
+            fetcher_url = trigger_url if trigger_url else None
+            fetcher = TriggerFetcher({'url': fetcher_url, 'sample_count': sample_count})
             try:
                 triggers = fetcher.fetch_triggers(token=token)
             except Exception as e:
@@ -94,7 +108,9 @@ class ArchiverLambdaService:
             # if response is list or single object, store raw JSON
             payload = triggers
             filename = self._format_filename(client_id, today)
-            key = f"trigger/{client_id}/{filename}"
+            # Use configured prefix (if provided) as the root; otherwise use 'trigger'
+            root_prefix = prefix if (prefix := (os.environ.get('PREFIX') or self.cfg.get('prefix', ''))) else 'trigger'
+            key = f"{root_prefix.rstrip('/')}/{client_id}/{filename}"
             data = json.dumps(payload, indent=2)
             try:
                 s3_path = self.uploader.upload(key, data.encode('utf-8'))
@@ -104,4 +120,4 @@ class ArchiverLambdaService:
                 continue
 
         return {'archived': results, 'count': len(results)}
-*** End Patch
+ 
