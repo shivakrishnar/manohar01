@@ -5,3 +5,23 @@ storage:
   type: local
   local_dir: ./python/archives
 output: ./python/output
+
+# Example clients list used for local testing. In production, set CLIENTS_API_URL to
+# an endpoint that returns an array of client objects with 'client_id', 'oauth_client_id',
+# 'oauth_client_secret' and 'scopes'. The SQL in ticket can be used to produce such a list:
+#
+# SELECT DISTINCT c.ClientID AS client_id, c.name, c.OAuth2ClientCredentialsID AS oauth_client_id
+# FROM Client c
+# INNER JOIN ClientServiceExt cs ON c.ClientID = cs.ClientID
+# WHERE c.OAuth2ClientCredentialsID is not NULL
+# AND cs.ServiceID IN (2,8,3,4,5)
+
+clients:
+  - client_id: sample-client-1
+    name: Sample Client 1
+    oauth_client_id: sample-client-1
+    oauth_client_secret: secret
+    scopes:
+      - dex/trigger:all
+    # optional: per-client trigger url if different
+    # trigger_url: https://example.com/data-exchange/trigger
