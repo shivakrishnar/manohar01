@@ -1,37 +1,16 @@
-# DAO Java Gradle Project
+# Repository (python branch): Java files removed from this branch
 
-This project is a minimal Java 17 Gradle project demonstrating a simple DAO pattern with an in-memory implementation and unit tests.
+The `python` branch only contains a Python port of the original project under the `python/` directory.
 
-Project layout:
+If you need the original Java project it has been preserved in the `main-java-backup` branch (or check `main` for the latest state before cleanup).
 
-- `build.gradle` - Gradle build file
-- `settings.gradle` - project name
-- `src/main/java/com/example/...` - application and DAO implementation
-- `src/test/java/...` - JUnit 5 tests
+Files remaining in this branch:
 
-Quick start
+- python/ (Python port and example config)
+- README.md (this file)
+- .github/, .gitignore, and VS Code settings for repository metadata
 
-1. Ensure you have Java 17 and Gradle installed (or use the Gradle wrapper if added).
-
-2. Build and run tests:
-
-```bash
-cd dao-gradle-project
-./gradlew test   # if you have the wrapper
-# or with system gradle
-gradle test
-```
-
-3. Run the application:
-
-```bash
-gradle run
-```
-
-Notes
-
-- The DAO lives in `com.example.dao`. `InMemoryUserDao` is thread-safe and backed by a `ConcurrentHashMap`.
-- Tests use JUnit 5 (Jupiter).
+Run the Python port from the `python/` directory as described in `python/README.md`.
 
 Build outputs and JSON manifest
 --------------------------------
