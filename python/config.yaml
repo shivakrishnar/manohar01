@@ -1,0 +1,7 @@
+api:
+  # optional: url: https://example.com/api/triggers
+  sample_count: 3
+storage:
+  type: local
+  local_dir: ./python/archives
+output: ./python/output

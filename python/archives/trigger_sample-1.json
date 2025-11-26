@@ -1,0 +1,7 @@
+{
+  "id": "sample-1",
+  "payload": {
+    "message": "Hello",
+    "index": 1
+  }
+}
