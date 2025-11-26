@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Pyarchiver serverless template — deploys Lambda to fetch /data-exchange/trigger for clients and upload to S3
+
+Globals:
+  Function:
+    Timeout: 60
+    MemorySize: 256
+
+Parameters:
+  ArchiveBucket:
+    Type: String
+    Description: S3 bucket where trigger files will be archived
+
+Resources:
+  PyArchiverFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: pyarchiver-handler
+      Handler: pyarchiver.lambda_handler.handler
+      Runtime: python3.12
+      CodeUri: ./
+      Environment:
+        Variables:
+          BUCKET: !Ref ArchiveBucket
+          PREFIX: "trigger"
+      Policies:
+        - S3WritePolicy:
+            BucketName: !Ref ArchiveBucket
+      Events:
+        ScheduledTrigger:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 day)
+            Input: '{"action":"run_clients"}'
+
+Outputs:
+  FunctionName:
+    Description: The function name
+    Value: !Ref PyArchiverFunction
+
