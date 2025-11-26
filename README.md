@@ -1,37 +1,10 @@
-# DAO Java Gradle Project
+# Repository status: Java project removed from `main`
 
-This project is a minimal Java 17 Gradle project demonstrating a simple DAO pattern with an in-memory implementation and unit tests.
+The previous Java/Gradle project has been removed from the `main` branch and preserved in a backup branch called `main-java-backup`.
 
-Project layout:
+If you're looking for the new Python implementation, switch to the `python` branch — it contains a minimal port of the archiver service (lightweight CLI, fetcher, storage uploaders, DAOs).
 
-- `build.gradle` - Gradle build file
-- `settings.gradle` - project name
-- `src/main/java/com/example/...` - application and DAO implementation
-- `src/test/java/...` - JUnit 5 tests
-
-Quick start
-
-1. Ensure you have Java 17 and Gradle installed (or use the Gradle wrapper if added).
-
-2. Build and run tests:
-
-```bash
-cd dao-gradle-project
-./gradlew test   # if you have the wrapper
-# or with system gradle
-gradle test
-```
-
-3. Run the application:
-
-```bash
-gradle run
-```
-
-Notes
-
-- The DAO lives in `com.example.dao`. `InMemoryUserDao` is thread-safe and backed by a `ConcurrentHashMap`.
-- Tests use JUnit 5 (Jupiter).
+If you need to restore or inspect the original Java sources, they are available on the `main-java-backup` branch.
 
 Build outputs and JSON manifest
 --------------------------------
@@ -63,3 +36,7 @@ Example manifest keys:
 - outputs.resourcesDir — path to runtime resources
 
 This JSON file is useful for scripts, CI, or other tools that need to know where the build artifacts are located.
+
+---
+
+Note: `main` branch now contains the repository maintenance files only. The Java implementation has moved to `main-java-backup` and the Python port lives on `python`.
