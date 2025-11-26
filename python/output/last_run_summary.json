@@ -1,0 +1,17 @@
+{
+  "project": "dex-trigger-response-archive",
+  "archived": [
+    {
+      "id": "sample-1",
+      "path": "/home/ubuntu/dex-trigger-response-archive/python/archives/trigger_sample-1.json"
+    },
+    {
+      "id": "sample-2",
+      "path": "/home/ubuntu/dex-trigger-response-archive/python/archives/trigger_sample-2.json"
+    },
+    {
+      "id": "sample-3",
+      "path": "/home/ubuntu/dex-trigger-response-archive/python/archives/trigger_sample-3.json"
+    }
+  ]
+}
