@@ -33,6 +33,12 @@ dependencies {
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
+
+    // Add the SQL Server JDBC driver as a runtime-only dependency so the project
+    // can connect to SQL Server at runtime without needing the driver on the
+    // compile classpath (keeps build portability in environments without DB).
+    // use a recent, available MS SQL driver artifact (jre11 artifact works across newer JVMs)
+    runtimeOnly 'com.microsoft.sqlserver:mssql-jdbc:12.10.2.jre11'
 }
 
 // Note: `useJUnitPlatform()` is not available on very old Gradle versions; the project
@@ -50,6 +56,45 @@ jar {
     archiveBaseName.set('dex-trigger-response-archive')
     archiveVersion.set(project.version.toString())
 }
+
+// Task: generateOutputManifest
+// Creates build/outputs/outputs.json containing a JSON manifest of main build artifacts
+task generateOutputManifest() {
+    group = 'build'
+    description = 'Generate a JSON manifest describing build outputs (jar, classes, resources, tests, generated sources).'
+
+    def outDir = file("${buildDir}/outputs")
+    outputs.dir outDir
+
+    doLast {
+        outDir.mkdirs()
+
+        // Resolve jar archive produced by the 'jar' task (works across Gradle versions)
+        def jarFile = tasks.named('jar').get().archiveFile.get().asFile
+
+        def manifest = [
+            project: project.name,
+            version: project.version.toString(),
+            outputs: [
+                jar: jarFile.canonicalPath,
+                classesDir: file("${buildDir}/classes/java/main").canonicalPath,
+                resourcesDir: file("${buildDir}/resources/main").canonicalPath,
+                generatedSources: file("${buildDir}/generated/sources/annotationProcessor").canonicalPath,
+                testResults: file("${buildDir}/test-results").canonicalPath,
+                reports: file("${buildDir}/reports").canonicalPath,
+                temp: file("${buildDir}/tmp").canonicalPath
+            ]
+        ]
+
+        def outFileName = "${project.name}_${project.version}.json"
+        def outFile = new File(outDir, outFileName)
+        outFile.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(manifest))
+        println "Wrote output manifest: ${outFile}"
+    }
+}
+
+// Ensure the manifest is created as part of a normal build
+build.dependsOn generateOutputManifest
 
 // Provide a compatible `run` task for environments without the application plugin
 task run(type: JavaExec) {

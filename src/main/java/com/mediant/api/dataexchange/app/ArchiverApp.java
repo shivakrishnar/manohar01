@@ -28,7 +28,18 @@ public class ArchiverApp {
         cfg.setJdbcUrl(p.getProperty("db.url"));
         cfg.setUsername(p.getProperty("db.user"));
         cfg.setPassword(p.getProperty("db.password"));
-        DataSource ds = new HikariDataSource(cfg);
+        DataSource ds;
+        try {
+            ds = new HikariDataSource(cfg);
+        } catch (Exception e) {
+            System.err.println("Failed to initialize database connection to '" + p.getProperty("db.url") + "'.");
+            System.err.println("Reason: " + e.getMessage());
+            System.err.println("Make sure the database is reachable and the JDBC properties are correct in " + propsFile + ".");
+            System.err.println("If you don't want to connect to a real database during development, set a valid 'db.*' URL or run the app in a test mode.");
+            // Exit explicitly to avoid an uncaught stacktrace from Hikari
+            System.exit(1);
+            return;
+        }
 
         String clientsQuery = p.getProperty("db.clients.query");
         ClientDao clientDao = new ClientDao(ds, clientsQuery);
