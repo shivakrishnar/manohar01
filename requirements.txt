@@ -1,0 +1,11 @@
+# AWS SDK for Python
+boto3>=1.28.0
+
+# SQL Server database driver
+pymssql>=2.2.8
+
+# HTTP requests library
+requests>=2.31.0
+
+# For enhanced security and retries
+urllib3>=2.0.0
